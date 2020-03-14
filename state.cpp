@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 class FlowerState;
 
@@ -10,38 +11,38 @@ public:
 	void dry();
 private:
 	friend class FlowerState;
-	void changeState(FlowerState* state);
-	FlowerState* fs;
+	void changeState(std::unique_ptr<FlowerState>&& state);
+	std::unique_ptr<FlowerState> fs;
 };
 
 class FlowerState
 {
 public:
-	virtual void addWater(Flower* f) = 0;
-	virtual void dry(Flower* f) = 0;
-	void changeState(FlowerState* state, Flower* f);
+	virtual void addWater(Flower& f) = 0;
+	virtual void dry(Flower& f) = 0;
+	void changeState(std::unique_ptr<FlowerState>&& state, Flower& f);
 	virtual ~FlowerState() = default;
 };
 
 class DryFlowerState : public FlowerState
 {
 public:
-	void addWater(Flower* f) override;
-	void dry(Flower* f) override;
+	void addWater(Flower& f) override;
+	void dry(Flower& f) override;
 };
 
 class SaturatedFlowerState : public FlowerState
 {
 public:
-	void addWater(Flower* f) override;
-	void dry(Flower* f) override;
+	void addWater(Flower& f) override;
+	void dry(Flower& f) override;
 };
 
 class GoodFlowerState : public FlowerState
 {
 public:
-	void addWater(Flower* f) override;
-	void dry(Flower* f) override;
+	void addWater(Flower& f) override;
+	void dry(Flower& f) override;
 };
 
 int main()
@@ -57,60 +58,59 @@ int main()
 	f.addWater();
 }
 
-Flower::Flower() : fs(new GoodFlowerState) {}
+Flower::Flower() : fs(std::make_unique<GoodFlowerState>()) {}
 
 void Flower::addWater()
 {
-	fs->addWater(this);
+	fs->addWater(*this);
 }
 
 void Flower::dry()
 {
-	fs->dry(this);
+	fs->dry(*this);
 }
 
-void Flower::changeState(FlowerState* state)
+void Flower::changeState(std::unique_ptr<FlowerState>&& state)
 {
-	delete fs;
-	fs = state;
+	fs = std::move(state);
 }
 
-void FlowerState::changeState(FlowerState* state, Flower* f)
+void FlowerState::changeState(std::unique_ptr<FlowerState>&& state, Flower& f)
 {
-	f->changeState(state);
+	f.changeState(std::move(state));
 }
 
-void DryFlowerState::addWater(Flower* f)
+void DryFlowerState::addWater(Flower& f)
 {
 	std::puts("added water - saved the flower");
-	changeState(new GoodFlowerState, f);
+	changeState(std::make_unique<GoodFlowerState>(), f);
 }
 
-void DryFlowerState::dry(Flower* f)
+void DryFlowerState::dry(Flower& f)
 {	
 	std::puts("can't dry, already dead");
 }
 
-void SaturatedFlowerState::addWater(Flower* f)
+void SaturatedFlowerState::addWater(Flower& f)
 {
 	std::puts("can't add water, already saturated");
 }
 	
-void SaturatedFlowerState::dry(Flower* f)
+void SaturatedFlowerState::dry(Flower& f)
 {
 	std::puts("dried - saved the flower");
-	changeState(new GoodFlowerState, f);
+	changeState(std::make_unique<GoodFlowerState>(), f);
 }
 
-void GoodFlowerState::addWater(Flower* f)
+void GoodFlowerState::addWater(Flower& f)
 {
 	std::puts("added water");
-	changeState(new SaturatedFlowerState, f);
+	changeState(std::make_unique<SaturatedFlowerState>(), f);
 }
 
-void GoodFlowerState::dry(Flower* f)
+void GoodFlowerState::dry(Flower& f)
 {
 	std::puts("dried flower");
-	changeState(new DryFlowerState, f);
+	changeState(std::make_unique<DryFlowerState>(), f);
 }
 
