@@ -26,23 +26,24 @@ public:
 	std::unique_ptr<Animal> clone() override;
 };
 
-class AnimalPrototypeFactory
+template <typename T>
+class PrototypeFactory
 {
 public:
-	AnimalPrototypeFactory(std::unique_ptr<Animal> ptr);
-	virtual std::unique_ptr<Animal> makeAnimal() const;
+	PrototypeFactory(std::unique_ptr<T> ptr);
+	virtual std::unique_ptr<T> getPrototype() const;
 private:
-	std::unique_ptr<Animal> prototype;
+	std::unique_ptr<T> prototype;
 };
 
 int main()
 {
-	AnimalPrototypeFactory dpf(std::make_unique<Dog>());
-	auto animal1 = dpf.makeAnimal();
+	PrototypeFactory<Animal> dpf(std::make_unique<Dog>());
+	auto animal1 = dpf.getPrototype();
 	animal1->giveVoice();	
 
-	AnimalPrototypeFactory cpf(std::make_unique<Cat>()); 
-	auto animal2 = cpf.makeAnimal();
+	PrototypeFactory<Animal> cpf(std::make_unique<Cat>()); 
+	auto animal2 = cpf.getPrototype();
 	animal2->giveVoice(); 
 }
 
@@ -66,9 +67,11 @@ std::unique_ptr<Animal> Cat::clone()
 	return std::make_unique<Cat>(*this);
 }
 
-AnimalPrototypeFactory::AnimalPrototypeFactory(std::unique_ptr<Animal> ptr) : prototype(std::move(ptr)) {}
+template <typename T>
+PrototypeFactory<T>::PrototypeFactory(std::unique_ptr<T> ptr) : prototype(std::move(ptr)) {}
 
-std::unique_ptr<Animal> AnimalPrototypeFactory::makeAnimal() const
+template <typename T>
+std::unique_ptr<T> PrototypeFactory<T>::getPrototype() const
 {
 	return prototype->clone();
 }
