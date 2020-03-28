@@ -4,7 +4,8 @@
 class Animal
 {
 public:
-	virtual void giveVoice() const = 0;
+	virtual void giveVoice() const = 0; 
+	virtual ~Animal() = default;
 };
 
 class Dog : public Animal
@@ -16,31 +17,27 @@ public:
 class AnimalDecorator : public Animal
 {
 public:
-	AnimalDecorator(std::unique_ptr<Animal>&& ptr);
+	AnimalDecorator(const Animal& a);
 	void giveVoice() const override;
 private:
-	std::unique_ptr<Animal> anim;
+	const Animal& anim;
 };
 
 class NiceAnimalDecorator : public AnimalDecorator 
 {
 public:
-	NiceAnimalDecorator(std::unique_ptr<Animal>&& ptr);
+	NiceAnimalDecorator(const Animal& a);
 	void giveVoice() const override;
 private:
 	void giveIntroduction() const;
 };
 
-void showAnimal(std::unique_ptr<Animal>&& ptr)
-{
-	std::puts("new animal");
-	ptr->giveVoice();
-}
 
 int main()
 {
-	auto an = std::make_unique<NiceAnimalDecorator>(std::make_unique<Dog>());
-	showAnimal(std::move(an));
+	Dog d;
+	const Animal& an = NiceAnimalDecorator(d);
+	an.giveVoice();
 }
 
 void Dog::giveVoice() const
@@ -48,14 +45,14 @@ void Dog::giveVoice() const
 	std::puts("woof");
 }
 
-AnimalDecorator::AnimalDecorator(std::unique_ptr<Animal>&& ptr) : anim(std::move(ptr)) {}
+AnimalDecorator::AnimalDecorator(const Animal& a) : anim(a) {}
 
 void AnimalDecorator::giveVoice() const
 {
-	anim->giveVoice();
+	anim.giveVoice();
 }
 
-NiceAnimalDecorator::NiceAnimalDecorator(std::unique_ptr<Animal>&& ptr) : AnimalDecorator::AnimalDecorator(std::move(ptr)) {}
+NiceAnimalDecorator::NiceAnimalDecorator(const Animal& a) : AnimalDecorator::AnimalDecorator(a) {}
 
 void NiceAnimalDecorator::giveVoice() const
 {
