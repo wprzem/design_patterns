@@ -6,6 +6,7 @@ class Animal
 {
 public:
 	virtual void giveVoice() const = 0;
+	virtual ~Animal() = default;
 };
 
 class Dog : public Animal
@@ -27,6 +28,7 @@ public:
 	virtual std::unique_ptr<Animal> createAnimal() = 0;
 	void addAnimal(); 
 	void show() const;
+	virtual ~AnimalFactory() = default;
 private:
 	std::vector<std::unique_ptr<Animal>> animals;	
 };

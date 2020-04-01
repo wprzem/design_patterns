@@ -32,6 +32,7 @@ class PrototypeFactory
 public:
 	PrototypeFactory(std::unique_ptr<T> ptr);
 	virtual std::unique_ptr<T> getPrototype() const;
+	virtual ~PrototypeFactory() = default;
 private:
 	std::unique_ptr<T> prototype;
 };

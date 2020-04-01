@@ -6,6 +6,7 @@ class Printer
 {
 public:
 	virtual void print() const;
+	virtual ~Printer() = default;
 };
 
 class StringPrinter : public Printer
