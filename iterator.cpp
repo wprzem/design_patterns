@@ -23,6 +23,17 @@ private:
 	size_t idx;
 };
 
+template <typename In, typename Cont>
+class CircleTraverser 
+{
+public:
+	CircleTraverser(Cont& cont) : iter(cont) {}
+	template <typename F>
+	void traverse(int x, F func);
+private:
+	CircleIterator<In, Cont> iter;
+};
+
 template <typename T, size_t Size>
 class Collection
 {
@@ -51,6 +62,13 @@ int main()
 	Collection<int, 10> col(5);
 	auto iter = col.createIterator();
 	showItems(*iter, 20);
+	std::puts("------Traverser------");
+	CircleTraverser<int, Collection<int, 10>> ct(col);
+	ct.traverse(5, [](auto x) { 
+		static int num = 1;
+		std::cout << "num " << num << ": " << x << '\n'; 
+		num++;
+		});	
 }
 
 template <typename In, typename Cont>
@@ -66,6 +84,17 @@ template <typename In, typename Cont>
 In& CircleIterator<In, Cont>::getCurrent()
 {
 	return container[idx];
+}
+
+template <typename In, typename Cont>
+template <typename F>
+void CircleTraverser<In, Cont>::traverse(int x, F func)
+{
+	for(int i = 0; i < x; i++)
+	{
+		func(iter.getCurrent());
+		iter.next();
+	}
 }
 
 template <typename T, size_t Size>
