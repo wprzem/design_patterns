@@ -12,7 +12,7 @@ public:
 class Shop
 {
 public:
-	Shop(std::unique_ptr<ShopImpl>&& ptr);
+	Shop(std::unique_ptr<ShopImpl> ptr);
 	virtual void makeTransaction() const;
 	virtual ~Shop() = default;
 protected:
@@ -22,7 +22,7 @@ protected:
 class CandyShop : public Shop
 {
 public:
-	CandyShop(std::unique_ptr<ShopImpl>&& ptr);
+	CandyShop(std::unique_ptr<ShopImpl> ptr);
 	void makeTransaction() const override;
 private:
 	std::string candyName = "caramel";
@@ -40,14 +40,14 @@ int main()
 	cs->makeTransaction();
 }
 
-Shop::Shop(std::unique_ptr<ShopImpl>&& ptr) : simpl(std::move(ptr)) {}
+Shop::Shop(std::unique_ptr<ShopImpl> ptr) : simpl(std::move(ptr)) {}
 
 void Shop::makeTransaction() const
 {
 	simpl->implMakeTransaction();
 }
 
-CandyShop::CandyShop(std::unique_ptr<ShopImpl>&& ptr) : Shop::Shop(std::move(ptr)) {}
+CandyShop::CandyShop(std::unique_ptr<ShopImpl> ptr) : Shop::Shop(std::move(ptr)) {}
 
 void CandyShop::makeTransaction() const
 {
