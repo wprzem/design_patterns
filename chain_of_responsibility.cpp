@@ -13,7 +13,7 @@ class Handler
 {
 public:
 	virtual void handleRequest(Request req);
-	virtual std::shared_ptr<Handler> setNext(std::shared_ptr<Handler> handler);
+	virtual const std::shared_ptr<Handler>& setNext(const std::shared_ptr<Handler>& handler);
 	virtual ~Handler() = default;
 private:
 	std::shared_ptr<Handler> next;
@@ -42,8 +42,14 @@ int main()
 	auto ah = std::make_shared<AutomaticHandler>();
 	auto rh = std::make_shared<RegularHandler>();
 	auto sh = std::make_shared<SpecialHandler>();
+	
 	ah->setNext(rh)->setNext(sh);
+
+	std::puts("\ninvalid request");
 	ah->handleRequest(Request::INVALID);
+
+	std::puts("\nhard request");
+	ah->handleRequest(Request::HARD);
 }
 
 void Handler::handleRequest(Request req)
@@ -58,7 +64,7 @@ void Handler::handleRequest(Request req)
 	}
 }
 
-std::shared_ptr<Handler> Handler::setNext(std::shared_ptr<Handler> handler)
+const std::shared_ptr<Handler>& Handler::setNext(const std::shared_ptr<Handler>& handler)
 {
 	next = handler;
 	return handler;
