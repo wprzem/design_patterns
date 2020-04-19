@@ -9,6 +9,7 @@ public:
 	virtual void tellMainPlot() const = 0;
 	virtual void tellIntroduction() const;
 	virtual void tellSurprise() const {}
+	virtual ~StoryTeller() = default;
 };
 
 class ScaryStoryTeller : public StoryTeller
